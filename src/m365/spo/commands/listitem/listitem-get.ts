@@ -68,7 +68,7 @@ class SpoListItemGetCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((response: any): void => {
-        (!args.options.output || args.options.output === 'text') && delete response["ID"];
+        delete response["ID"];
         logger.log(<ListItemInstance>response);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

@@ -6,6 +6,7 @@ export interface ListItemInstance {
   EditorId: number;
   GUID: string;
   Id: number;
+  ID?: number;
   Modified: Date;
   Title: string;
 } 

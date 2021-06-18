@@ -124,6 +124,7 @@ class SpoListItemListCommand extends SpoCommand {
         return args.options.camlQuery ? request.post(requestOptions) : request.get(requestOptions);
       })
       .then((listItemInstances: ListItemInstanceCollection): void => {
+        listItemInstances.value.forEach(v => delete v['ID']);
         logger.log(listItemInstances.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
