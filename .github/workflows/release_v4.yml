@@ -1,0 +1,199 @@
+name: Release v4
+
+on:
+  push:
+    branches: [v4]
+
+jobs:
+  build:
+    if: github.repository_owner == 'pnp'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [14]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+          key: node_modules-${{ matrix.os }}-${{ matrix.node }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Compress output (non-Windows)
+        if: matrix.os != 'windows-latest'
+        run: tar -cvf build.tar --exclude node_modules ./
+      - name: Compress output (Windows)
+        if: matrix.os == 'windows-latest'
+        run: 7z a -ttar -xr!node_modules -r build.tar .
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-${{ matrix.os }}-${{ matrix.node }}
+          path: build.tar
+  test:
+    if: github.repository_owner == 'pnp'
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        # node versions to run tests on
+        nodeRun: [14]
+        # node versions on which code was built and should be tested
+        nodeBuild: [14]
+        include:
+          - os: ubuntu-latest
+            nodeRun: 12
+            nodeBuild: 14
+          - os: ubuntu-latest
+            nodeRun: 16
+            nodeBuild: 14
+
+    steps:
+      - name: Configure pagefile
+        if: matrix.os == 'windows-latest'
+        uses: al-cheb/configure-pagefile-action@v1.2
+        with:
+          minimum-size: 16GB
+          maximum-size: 16GB
+          disk-root: "C:"
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
+      - name: Unpack build artifact (non-Windows)
+        if: matrix.os != 'windows-latest'
+        run: tar -xvf build.tar && rm build.tar
+      - name: Unpack build artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        run: 7z x build.tar && del build.tar
+      - name: Use Node.js ${{ matrix.nodeRun }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.nodeRun }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+          key: node_modules-${{ matrix.os }}-${{ matrix.nodeBuild }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Test with coverage
+        # we run coverage only on Node@14 because older version report it incorrectly
+        if: matrix.nodeRun == 14
+        run: npm test
+      - name: Test without coverage
+        # we want to run tests on older Node versions to ensure that code works
+        if: matrix.nodeRun != 14
+        run: npm run test:test
+      - name: Compress output (non-Windows)
+        if: matrix.nodeRun == 14 && matrix.os != 'windows-latest' && always()
+        run: tar -cvf coverage.tar coverage
+      - name: Compress output (Windows)
+        if: matrix.nodeRun == 14 && matrix.os == 'windows-latest' && always()
+        run: 7z a -ttar -r coverage.tar coverage
+      - uses: actions/upload-artifact@v2
+        if: matrix.nodeRun == 14 && always()
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
+          path: coverage.tar
+  publish_v4:
+    if: github.repository_owner == 'pnp'
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-ubuntu-latest-14
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
+      - name: Use Node.js 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: 'https://registry.npmjs.org'
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+          key: node_modules-ubuntu-latest-14-${{ hashFiles('**/npm-shrinkwrap.json') }}
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Stamp beta to package version
+        run: node scripts/update-package-version.js $GITHUB_SHA
+      - name: Publish @four
+        run: npm publish --tag four --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Compress output
+        run: tar -cvf build.tar --exclude node_modules ./
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-ubuntu-latest-14
+          path: build.tar
+  deploy_docker:
+    if: github.repository_owner == 'pnp'
+    needs: publish_v4
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-ubuntu-latest-14
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
+      - name: Use Node.js 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: 'https://registry.npmjs.org'
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Extract version from package
+        id: package_version
+        run: |
+          echo "::set-output name=version::$(node -p "require('./package.json').version")"
+      - name: Wait for npm publish
+        run: node scripts/wait-npm-publish.js four ${{ steps.package_version.outputs.version }}
+      - name: Build and push ${{ steps.package_version.outputs.version }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: m365pnp/cli-microsoft365:${{ steps.package_version.outputs.version }}
+          build-args: |
+            CLI_VERSION=${{ steps.package_version.outputs.version }}
+      - name: Build and push four
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: m365pnp/cli-microsoft365:four
+          build-args: |
+            CLI_VERSION=${{ steps.package_version.outputs.version }}
