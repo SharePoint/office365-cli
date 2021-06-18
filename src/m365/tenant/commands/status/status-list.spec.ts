@@ -300,7 +300,7 @@ describe(commands.STATUS_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput.value));
         done();
       }
       catch (e) {
@@ -323,7 +323,7 @@ describe(commands.STATUS_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput.value));
         done();
       }
       catch (e) {
@@ -347,7 +347,7 @@ describe(commands.STATUS_LIST, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(jsonOutputForms));
+        assert(loggerLogSpy.calledWith(jsonOutputForms.value));
         done();
       }
       catch (e) {
@@ -371,7 +371,7 @@ describe(commands.STATUS_LIST, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(jsonOutputForms));
+        assert(loggerLogSpy.calledWith(jsonOutputForms.value));
         done();
       }
       catch (e) {

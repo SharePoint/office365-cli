@@ -49,7 +49,7 @@ class SpoUserListCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((users: any): void => {
-        logger.log(users);
+        logger.log(users.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

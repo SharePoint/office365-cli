@@ -53,7 +53,7 @@ class TenantServiceMessageListCommand extends Command {
           r.Message = r.Id.startsWith('MC') ? r.Title : r.ImpactDescription;
         });
 
-        logger.log(res);
+        logger.log(res.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

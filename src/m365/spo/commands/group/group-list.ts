@@ -47,7 +47,7 @@ class SpoGroupListCommand extends SpoCommand {
     request
       .get<GroupPropertiesCollection>(requestOptions)
       .then((groupProperties: GroupPropertiesCollection): void => {
-        logger.log(groupProperties);
+        logger.log(groupProperties.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

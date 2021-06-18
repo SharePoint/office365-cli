@@ -53,7 +53,7 @@ class TenantStatusListCommand extends Command {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        logger.log(res);
+        logger.log(res.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

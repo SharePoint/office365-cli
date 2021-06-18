@@ -161,7 +161,7 @@ describe(commands.SERVICE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput.value));
         done();
       }
       catch (e) {
@@ -185,7 +185,7 @@ describe(commands.SERVICE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput.value));
         done();
       }
       catch (e) {

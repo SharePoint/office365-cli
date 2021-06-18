@@ -51,7 +51,7 @@ class SpoWebListCommand extends SpoCommand {
     request
       .get<WebPropertiesCollection>(requestOptions)
       .then((webProperties: WebPropertiesCollection): void => {
-        logger.log(webProperties);
+        logger.log(webProperties.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

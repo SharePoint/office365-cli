@@ -109,36 +109,34 @@ describe(commands.USER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            Id: 6,
-            IsHiddenInUI: false,
-            LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
-            Title: "John Doe",
-            PrincipalType: 1,
-            Email: "john.deo@mytenant.onmicrosoft.com",
-            Expiration: "",
-            IsEmailAuthenticationGuestUser: false,
-            IsShareByEmailGuestUser: false,
-            IsSiteAdmin: true,
-            UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
-            UserPrincipalName: "john.doe@mytenant.onmicrosoft.com"
-          },
-          {
-            Id: 7,
-            IsHiddenInUI: false,
-            LoginName: "i:0#.f|membership|abc@mytenant.onmicrosoft.com",
-            Title: "FName Lname",
-            PrincipalType: 1,
-            Email: "abc@mytenant.onmicrosoft.com",
-            Expiration: "",
-            IsEmailAuthenticationGuestUser: false,
-            IsShareByEmailGuestUser: false,
-            IsSiteAdmin: false,
-            UserId: { NameId: "1003201096515567", NameIdIssuer: "urn:federation:microsoftonline" },
-            UserPrincipalName: "abc@mytenant.onmicrosoft.com"
-          }]
-        }));
+        assert(loggerLogSpy.calledWith([{
+          Id: 6,
+          IsHiddenInUI: false,
+          LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com",
+          Title: "John Doe",
+          PrincipalType: 1,
+          Email: "john.deo@mytenant.onmicrosoft.com",
+          Expiration: "",
+          IsEmailAuthenticationGuestUser: false,
+          IsShareByEmailGuestUser: false,
+          IsSiteAdmin: true,
+          UserId: { NameId: "10010001b0c19a2", NameIdIssuer: "urn:federation:microsoftonline" },
+          UserPrincipalName: "john.doe@mytenant.onmicrosoft.com"
+        },
+        {
+          Id: 7,
+          IsHiddenInUI: false,
+          LoginName: "i:0#.f|membership|abc@mytenant.onmicrosoft.com",
+          Title: "FName Lname",
+          PrincipalType: 1,
+          Email: "abc@mytenant.onmicrosoft.com",
+          Expiration: "",
+          IsEmailAuthenticationGuestUser: false,
+          IsShareByEmailGuestUser: false,
+          IsSiteAdmin: false,
+          UserId: { NameId: "1003201096515567", NameIdIssuer: "urn:federation:microsoftonline" },
+          UserPrincipalName: "abc@mytenant.onmicrosoft.com"
+        }]));
         done();
       }
       catch (e) {
@@ -177,20 +175,18 @@ describe(commands.USER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            "Id": 6,
-            "Title": "John Doe",
-            "Email": "john.deo@mytenant.onmicrosoft.com",
-            "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
-          },
-          {
-            "Id": 7,
-            "Title": "FName Lname",
-            "Email": "abc@mytenant.onmicrosoft.com",
-            "LoginName": "i:0#.f|membership|abc@mytenant.onmicrosoft.com"
-          }]
-        }));
+        assert(loggerLogSpy.calledWith([{
+          "Id": 6,
+          "Title": "John Doe",
+          "Email": "john.deo@mytenant.onmicrosoft.com",
+          "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+        },
+        {
+          "Id": 7,
+          "Title": "FName Lname",
+          "Email": "abc@mytenant.onmicrosoft.com",
+          "LoginName": "i:0#.f|membership|abc@mytenant.onmicrosoft.com"
+        }]));
         done();
       }
       catch (e) {
@@ -220,4 +216,4 @@ describe(commands.USER_LIST, () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
-}); 
+});

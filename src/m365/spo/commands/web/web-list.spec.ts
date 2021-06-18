@@ -16,7 +16,7 @@ describe(commands.WEB_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -115,7 +115,7 @@ describe(commands.WEB_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ value :[{
+        assert(loggerLogSpy.calledWith([{
           "AllowRssFeeds": false,
           "AlternateCssUrl": null,
           "AppInstanceId": "00000000-0000-0000-0000-000000000000",
@@ -148,7 +148,7 @@ describe(commands.WEB_LIST, () => {
           "UIVersionConfigurationEnabled": false,
           "Url": "https://Contoso.sharepoint.com/Subsite",
           "WebTemplate": "STS"
-        }]}));
+        }]));
         done();
       }
       catch (e) {
@@ -243,4 +243,4 @@ describe(commands.WEB_LIST, () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
-}); 
+});

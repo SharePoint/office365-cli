@@ -60,7 +60,7 @@ describe(commands.GROUP_LIST, () => {
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'LoginName', 'IsHiddenInUI', 'PrincipalType']);
   });
-  
+
   it('retrieves all groups with', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups') > -1) {
@@ -89,16 +89,14 @@ describe(commands.GROUP_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerLogSpy.calledWith({
-          value: [{
-            Id: 15,
-            Title: "Contoso Members",
-            LoginName: "Contoso Members",
-            "Description": "SharePoint Contoso",
-            IsHiddenInUI: false,
-            PrincipalType: 8
-          }]
-        }));
+        assert(loggerLogSpy.calledWith([{
+          Id: 15,
+          Title: "Contoso Members",
+          LoginName: "Contoso Members",
+          "Description": "SharePoint Contoso",
+          IsHiddenInUI: false,
+          PrincipalType: 8
+        }]));
         done();
       }
       catch (e) {
@@ -154,4 +152,4 @@ describe(commands.GROUP_LIST, () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
-}); 
+});
