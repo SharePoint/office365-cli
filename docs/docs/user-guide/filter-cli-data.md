@@ -44,11 +44,11 @@ Let's start with a basic command and return some results using the following com
 
 Using JMESPath queries you can do basic filtering as well as more complex scenario's like `starts_with` or `ends_with`.
 
-- `[?Title == 'Demo 1']` returns only the **first item** from the array as it matches on the title **Demo 1**
-- `[?contains(Title, 'Demo')]` would return the **first two items** as it matches the title on the word **Demo**
+- `[?Title == 'Demo 1']` returns only the **first item** from the array as it matches on the title **Demo 1**.
+- `[?contains(Title, 'Demo')]` would return the **first two items** as it matches the title on the word **Demo**.
 - `[?contains(*, 'Demo 1')]` would return any item in the array where the value of any property is **Demo 1**, currently only the **first item**.
-- `[?starts_with(Title, 'Demo')]` would only return the **first item** as it filters the title to start with **Demo**
-- `[?ends_with(Title, '1')]` returns the **first and last item**, as the title ends with a **1**
+- `[?starts_with(Title, 'Demo')]` would only return the **first item** as it filters the title to start with **Demo**.
+- `[?ends_with(Title, '1')]` returns the **first and last item**, as the title ends with a **1**.
 - `[?contains(Title, 'Demo') && AllowDownloadingNonWebViewableFiles]` returns only the **first item** as it **combines a title filter, and a check on AllowDownloadingNonWebViewableFiles** two filters.
 
 Besides filtering, you can also scope what will be returned as a result:
@@ -62,51 +62,110 @@ Or you can combine both a filter query and scope the results:
 
 ## Other array filters
 
-Some commands in the CLI still return their data wrapped in a `value` object. You can still use JMESPath for those, but a query will look slightly different. Executing the following command `m365 spo user list --webUrl https://contoso.sharepoint.com/ --output json` will return a dataset that is similar to the sample below:
+Some of the commands return complex types. Querying or filtering based on values in complex types can be done with JMESPath as well. The query, however, will look different. Executing the following command `m365 flow environment list --output json` will return a complex type and the result will be similar to the sample below:
 
 ```json
-{
-  "value": [
-    {
-      "Id": 7,
-      "LoginName": "i:0#.f|membership|garth@contoso.nl",
-      "Title": "Garth North",
-      "PrincipalType": 1,
-      "Email": "garth@contoso.nl",
-      "IsEmailAuthenticationGuestUser": false,
-      "IsShareByEmailGuestUser": false,
-      "IsSiteAdmin": true,
-      "UserId": {
-        "NameId": "xxxx",
-        "NameIdIssuer": "urn:federation:microsoftonline"
+[
+  {
+    "name": "4be50206-9576-4237-8b17-36d8aadfaa36",
+    "location": "europe",
+    "type": "Microsoft.ProcessSimple/environments",
+    "id": "/providers/Microsoft.ProcessSimple/environments/4be50206-9576-4237-8b17-36d8aadfaa36",
+    "properties": {
+      "displayName": "Contoso Dev Environment",
+      "createdTime": "2021-06-18T16:36:20.5687306Z",
+      "createdBy": {
+        "id": "SYSTEM",
+        "displayName": "SYSTEM",
+        "type": "NotSpecified"
       },
-      "UserPrincipalName": "garth@contoso.nl"
+      "lastModifiedTime": "2021-06-18T16:40:32.7592868Z",
+      "provisioningState": "Succeeded",
+      "creationType": "Developer",
+      "environmentSku": "Developer",
+      "environmentType": "NotSpecified",
+      "states": {
+        "management": {
+          "id": "Ready"
+        },
+        "runtime": {
+          "id": "Enabled"
+        }
+      },
+      "isDefault": false,
+      "azureRegionHint": "westeurope",
+      "runtimeEndpoints": {
+        "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+        "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+        "microsoft.PowerApps": "https://europe.api.powerapps.com",
+        "microsoft.Flow": "https://europe.api.flow.microsoft.com",
+        "microsoft.PowerAppsAdvisor": "https://europe.api.advisor.powerapps.com",
+        "microsoft.ApiManagement": "https://management.EUR.azure-apihub.net"
+      },
+      "environmentFeatures": {
+        "isOpenApiEnabled": false
+      }
     },
-    {
-      "Id": 2,
-      "LoginName": "i:0#.f|membership|admin@contoso.nl",
-      "Title": "Admin",
-      "Email": "Admin@contoso.nl",
-      "Expiration": "",
-      "IsEmailAuthenticationGuestUser": false,
-      "IsShareByEmailGuestUser": false,
-      "IsSiteAdmin": true,
-      "UserId": {
-        "NameId": "xxxx",
-        "NameIdIssuer": "urn:federation:microsoftonline"
+    "displayName": "Contoso Dev Environment"
+  },
+  {
+    "name": "Default-3ca3eaa6-140f-4175-9563-2272edf9f338",
+    "location": "europe",
+    "type": "Microsoft.ProcessSimple/environments",
+    "id": "/providers/Microsoft.ProcessSimple/environments/Default-3ca3eaa6-140f-4175-9563-2272edf9f338",
+    "properties": {
+      "displayName": "contoso (default)",
+      "createdTime": "2016-10-28T10:32:54.1945519Z",
+      "createdBy": {
+        "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e",
+        "displayName": "Garth Fort",
+        "type": "NotSpecified"
       },
-      "UserPrincipalName": "admin@contoso.nl"
-    }
-  ]
-}
+      "lastModifiedTime": "2020-07-28T08:58:12.5785779Z",
+      "lastModifiedBy": {
+        "id": "88e85b64-e687-4e0b-bbf4-f42f5f8e674e",
+        "displayName": "Garth Fort",
+        "email": "garthf@contoso.nl",
+        "type": "User",
+        "tenantId": "3ca3eaa6-140f-4175-9563-2272edf9f338",
+        "userPrincipalName": "garthf@contoso.nl"
+      },
+      "provisioningState": "Succeeded",
+      "creationType": "DefaultTenant",
+      "environmentSku": "Default",
+      "environmentType": "NotSpecified",
+      "states": {
+        "management": {
+          "id": "NotSpecified"
+        },
+        "runtime": {
+          "id": "Enabled"
+        }
+      },
+      "isDefault": true,
+      "azureRegionHint": "westeurope",
+      "runtimeEndpoints": {
+        "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com",
+        "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com",
+        "microsoft.PowerApps": "https://europe.api.powerapps.com",
+        "microsoft.Flow": "https://europe.api.flow.microsoft.com",
+        "microsoft.PowerAppsAdvisor": "https://europe.api.advisor.powerapps.com",
+        "microsoft.ApiManagement": "https://management.EUR.azure-apihub.net"
+      },
+      "environmentFeatures": {
+        "isOpenApiEnabled": false
+      }
+    },
+    "displayName": "contoso (default)"
+  }
+]
 ```
 
-- `value[?Title == 'Garth North']` returns only the **first item** from the array as it matches on **Garth North**
-- `value[?contains(Email, 'Contoso')]` would return the **all items** as it matches the **Email** on the word **Contoso**
-- `value[?contains(*, 'North')]` would return any item in the array where the value of **any property is North**, currently only the **first item**.
-- `[?starts_with(Title, 'Garth')]` would only return the **first item** as it filters the **title to start with Garth**
-- `[?ends_with(UserPrincipalName, '.nl')]` returns the **all items**, as the **title ends with a .nl**
-- `[?contains(Title, 'Garth') && IsSiteAdmin]` returns only the **first item** as it **combines a title filter, and a check on IsSiteAdmin** two filters.
+- `[?name == '4be50206-9576-4237-8b17-36d8aadfaa36']` returns only the **first item** from the array as it matches on **4be50206-9576-4237-8b17-36d8aadfaa36**.
+- `[?properties.displayName == 'Contoso Dev Environment']` would return the **first item** from the array as it matches on **Contoso Dev Environment**.
+- `[?properties.provisioningState == 'Succeeded']` would return the **both items** from the array as both had provisioningState **Succeeded**.
+- `[?starts_with(properties.displayName, 'Contoso')]` or `[?starts_with(displayName, 'Contoso')]` would return the **first item** of the array as it filters on the displayName for **Contoso** and each filter is case-sensitive.
+- `[?ends_with(properties.azureRegionHint, 'europe')]` would return **both** items as it filters on **europe**.
 
 !!! important
     All JMESPath queries are case sensitive
