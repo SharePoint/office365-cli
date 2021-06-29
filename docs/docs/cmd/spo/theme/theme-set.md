@@ -13,8 +13,8 @@ m365 spo theme set [options]
 `-n, --name <name>`
 : Name of the theme to add or update
 
-`-p, --filePath <filePath>`
-: Absolute or relative path to the theme json file
+`-t, --theme <theme>`
+: Theme JSON contents
 
 `--isInverted`
 : Set to specify that the theme is inverted
@@ -57,25 +57,25 @@ To prevent the accidental creation of invalid themes the CLI for Microsoft 365 i
 
 When executing the `m365 spo theme set` command the following checks are executed:
 
-- Validate if the provided file is a valid `JSON` string.
-- Validate if the provided file, once deserialized, contains all properties of the sample above.
-- Validate if the provided file, once deserialized, contains only the properties of the sample above.
+- Validate if the provided theme is a valid `JSON` string.
+- Validate if the provided theme, once deserialized, contains all properties of the sample above.
+- Validate if the provided theme, once deserialized, contains only the properties of the sample above.
 - Validate if each of the properties contains a valid hex color value prefixed with a `#`.
 
-If any of these checks fails you are presented with a `File contents is not a valid theme` error.
+If any of these checks fails you are presented with a `The specified theme is not valid` error.
 
 ## Examples
 
 Add or update a theme from a theme JSON file
 
 ```sh
-m365 spo theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
+m365 spo theme set --name Contoso-Blue --theme @/Users/rjesh/themes/contoso-blue.json
 ```
 
 Add or update an inverted theme from a theme JSON file
 
 ```sh
-m365 spo theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --isInverted
+m365 spo theme set --name Contoso-Blue --theme @/Users/rjesh/themes/contoso-blue.json --isInverted
 ```
 
 ## More information

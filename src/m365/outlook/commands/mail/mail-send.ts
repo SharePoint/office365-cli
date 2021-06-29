@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -17,7 +15,6 @@ interface Options extends GlobalOptions {
   subject: string;
   to: string;
   bodyContents?: string;
-  bodyContentsFilePath?: string;
   bodyContentType?: string;
   saveToSentItems?: string;
 }
@@ -38,17 +35,13 @@ class OutlookMailSendCommand extends GraphCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.bodyContents = typeof args.options.bodyContents !== 'undefined';
-    telemetryProps.bodyContentsFilePath = typeof args.options.bodyContentsFilePath !== 'undefined';
     telemetryProps.bodyContentType = args.options.bodyContentType;
     telemetryProps.saveToSentItems = args.options.saveToSentItems;
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let bodyContents: string = args.options.bodyContents as string;
-    if (args.options.bodyContentsFilePath) {
-      bodyContents = fs.readFileSync(path.resolve(args.options.bodyContentsFilePath), 'utf-8');
-    }
+    const bodyContents: string = args.options.bodyContents as string;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/me/sendMail`,
@@ -90,10 +83,7 @@ class OutlookMailSendCommand extends GraphCommand {
         option: '-t, --to <to>'
       },
       {
-        option: '--bodyContents [bodyContents]'
-      },
-      {
-        option: '--bodyContentsFilePath [bodyContentsFilePath]'
+        option: '--bodyContents <bodyContents>'
       },
       {
         option: '--bodyContentType [bodyContentType]',
@@ -109,26 +99,6 @@ class OutlookMailSendCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.bodyContents && !args.options.bodyContentsFilePath) {
-      return 'Specify either bodyContents or bodyContentsFilePath';
-    }
-
-    if (args.options.bodyContents && args.options.bodyContentsFilePath) {
-      return 'Specify either bodyContents or bodyContentsFilePath but not both';
-    }
-
-    if (args.options.bodyContentsFilePath) {
-      const fullPath: string = path.resolve(args.options.bodyContentsFilePath);
-
-      if (!fs.existsSync(fullPath)) {
-        return `File '${fullPath}' not found`;
-      }
-
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return `Path '${fullPath}' points to a directory`;
-      }
-    }
-
     if (args.options.bodyContentType &&
       args.options.bodyContentType !== 'Text' &&
       args.options.bodyContentType !== 'HTML') {

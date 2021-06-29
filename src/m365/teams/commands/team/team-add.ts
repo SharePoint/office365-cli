@@ -1,6 +1,4 @@
 import { AxiosRequestConfig } from 'axios';
-import * as fs from 'fs';
-import * as path from 'path';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -37,7 +35,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   description?: string;
   name?: string;
-  templatePath?: string;
+  template?: string;
   wait: boolean;
 }
 
@@ -57,7 +55,7 @@ class TeamsTeamAddCommand extends GraphCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.name = typeof args.options.name !== 'undefined';
     telemetryProps.description = typeof args.options.description !== 'undefined';
-    telemetryProps.templatePath = typeof args.options.templatePath !== 'undefined';
+    telemetryProps.template = typeof args.options.template !== 'undefined';
     telemetryProps.wait = args.options.wait;
     return telemetryProps;
   }
@@ -66,13 +64,11 @@ class TeamsTeamAddCommand extends GraphCommand {
     this.dots = '';
 
     let requestBody: any;
-    if (args.options.templatePath) {
-      const fullPath: string = path.resolve(args.options.templatePath);
-
+    if (args.options.template) {
       if (this.verbose) {
-        logger.logToStderr(`Using template '${fullPath}'...`);
+        logger.logToStderr(`Using template...`);
       }
-      requestBody = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
+      requestBody = JSON.parse(args.options.template);
 
       if (args.options.name) {
         if (this.verbose) {
@@ -186,7 +182,7 @@ class TeamsTeamAddCommand extends GraphCommand {
         option: '-d, --description [description]'
       },
       {
-        option: '--templatePath [templatePath]'
+        option: '--template [template]'
       },
       {
         option: '--wait'
@@ -198,7 +194,7 @@ class TeamsTeamAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.templatePath) {
+    if (!args.options.template) {
       if (!args.options.name) {
         return `Required parameter name missing`;
       }
@@ -206,10 +202,6 @@ class TeamsTeamAddCommand extends GraphCommand {
       if (!args.options.description) {
         return `Required parameter description missing`;
       }
-    }
-
-    if (args.options.templatePath && !fs.existsSync(args.options.templatePath)) {
-      return 'Specified path of the template does not exist';
     }
 
     return true;

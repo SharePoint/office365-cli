@@ -11,13 +11,13 @@ m365 teams team add [options]
 ## Options
 
 `-n, --name [name]`
-: Display name for the Microsoft Teams team. Required if `templatePath` not supplied
+: Display name for the Microsoft Teams team. Required if `template` not supplied
 
 `-d, --description [description]`
-: Description for the Microsoft Teams team. Required if `templatePath` not supplied
+: Description for the Microsoft Teams team. Required if `template` not supplied
 
-`--templatePath [templatePath]`
-: Local path to the file containing the template. If `name` or `description` are supplied, these take precedence over the template values
+`--template [template]`
+: Template to use to create the team. If `name` or `description` are supplied, these take precedence over the template values
 
 `--wait`
 : Wait for the team to be provisioned before completing the command
@@ -38,16 +38,16 @@ Add a new Microsoft Teams team
 m365 teams team add --name "Architecture" --description "Architecture Discussion"
 ```
 
-Add a new Microsoft Teams team using a template
+Add a new Microsoft Teams team using a template from a file
 
 ```sh
-m365 teams team add --name "Architecture" --description "Architecture Discussion" --templatePath "template.json"
+m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json
 ```
 
 Add a new Microsoft Teams team using a template and wait for the team to be provisioned
 
 ```sh
-m365 teams team add --name "Architecture" --description "Architecture Discussion" --templatePath "template.json" --wait
+m365 teams team add --name "Architecture" --description "Architecture Discussion" --template @template.json --wait
 ```
 
 ## More information

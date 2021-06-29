@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -18,7 +16,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   name: string;
-  filePath: string;
+  theme: string;
   isInverted: boolean;
 }
 
@@ -47,13 +45,7 @@ class SpoThemeSetCommand extends SpoCommand {
         return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
-        const fullPath: string = path.resolve(args.options.filePath);
-
-        if (this.verbose) {
-          logger.logToStderr(`Adding theme from ${fullPath} to tenant...`);
-        }
-
-        const palette: any = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+        const palette: any = JSON.parse(args.options.theme);
 
         if (this.debug) {
           logger.logToStderr('');
@@ -91,7 +83,7 @@ class SpoThemeSetCommand extends SpoCommand {
       option: '-n, --name <name>'
     },
     {
-      option: '-p, --filePath <filePath>'
+      option: '-t, --theme <theme>'
     },
     {
       option: '--isInverted'
@@ -102,18 +94,8 @@ class SpoThemeSetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const fullPath: string = path.resolve(args.options.filePath);
-
-    if (!fs.existsSync(fullPath)) {
-      return `File '${fullPath}' not found`;
-    }
-
-    if (fs.lstatSync(fullPath).isDirectory()) {
-      return `Path '${fullPath}' points to a directory`;
-    }
-
-    if (!Utils.isValidTheme(fs.readFileSync(fullPath, 'utf-8'))) {
-      return 'File contents is not a valid theme';
+    if (!Utils.isValidTheme(args.options.theme)) {
+      return 'The specified theme is not valid';
     }
 
     return true;

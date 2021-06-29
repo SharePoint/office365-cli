@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -42,8 +41,6 @@ describe(commands.TEAM_ADD, () => {
     Utils.restore([
       request.post,
       request.get,
-      fs.existsSync,
-      fs.readFileSync,
       global.setTimeout
     ]);
   });
@@ -76,10 +73,9 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('passes validation if name and description are not passed when a template is supplied', (done) => {
-    sinon.stub(fs, 'existsSync').returns(true);
     const actual = command.validate({
       options: {
-        templatePath: 'template.json'
+        template: `abc`
       }
     });
     assert.strictEqual(actual, true);
@@ -100,17 +96,6 @@ describe(commands.TEAM_ADD, () => {
     const actual = command.validate({
       options: {
         description: 'Architecture Discussion'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if template not found', (done) => {
-    sinon.stub(fs, 'existsSync').returns(false);
-    const actual = command.validate({
-      options: {
-        templatePath: 'abc'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -167,12 +152,12 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('creates Microsoft Teams team in the tenant when template is supplied (verbose)', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
+    }`;
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -202,7 +187,7 @@ describe(commands.TEAM_ADD, () => {
     command.action(logger, {
       options: {
         verbose: true,
-        templatePath: 'template.json'
+        template
       }
     }, () => {
       try {
@@ -221,12 +206,12 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('creates Microsoft Teams team in the tenant when template and name is supplied (verbose)', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
+    }`;
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -257,7 +242,7 @@ describe(commands.TEAM_ADD, () => {
       options: {
         verbose: true,
         name: 'Sample Classroom Team',
-        templatePath: 'template.json'
+        template
       }
     }, () => {
       try {
@@ -276,12 +261,12 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('creates Microsoft Teams team in the tenant when template and description is supplied (verbose)', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
+    }`;
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -312,7 +297,7 @@ describe(commands.TEAM_ADD, () => {
       options: {
         verbose: true,
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json'
+        template
       }
     }, () => {
       try {
@@ -331,12 +316,12 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('creates Microsoft Teams team in the tenant when template, name and description is supplied (verbose)', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
+    }`;
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -368,7 +353,7 @@ describe(commands.TEAM_ADD, () => {
         verbose: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json'
+        template
       }
     }, () => {
       try {
@@ -387,12 +372,12 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('creates Microsoft Teams team in the tenant when template, name and description is supplied and waits for command to complete (verbose)', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
+    }`;
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -468,7 +453,7 @@ describe(commands.TEAM_ADD, () => {
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json'
+        template
       }
     }, () => {
       try {
@@ -508,12 +493,12 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('correctly handles operation error when creating a Team when waiting for command to complete', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
+    }`;
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -570,7 +555,7 @@ describe(commands.TEAM_ADD, () => {
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json'
+        template
       }
     } as any, (err?: any) => {
       try {
@@ -589,12 +574,12 @@ describe(commands.TEAM_ADD, () => {
   });
 
   it('correctly handles inProgress operation status when creating a Team and waiting for the command to complete', (done) => {
-    sinon.stub(fs, 'readFileSync').callsFake(() => `
+    const template = `
     {
       "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
-    }`);
+    }`;
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
@@ -651,7 +636,7 @@ describe(commands.TEAM_ADD, () => {
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json'
+        template
       }
     } as any, () => {
       try {

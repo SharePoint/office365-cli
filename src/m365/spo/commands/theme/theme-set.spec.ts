@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -15,7 +14,6 @@ describe(commands.THEME_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let readFileSyncStub: sinon.SinonStub;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -39,14 +37,10 @@ describe(commands.THEME_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => '123');
   });
 
   afterEach(() => {
     Utils.restore([
-      fs.readFileSync,
-      fs.existsSync,
-      fs.lstatSync,
       request.post,
       Utils.isValidTheme
     ]);
@@ -72,7 +66,6 @@ describe(commands.THEME_SET, () => {
 
   it('adds theme when correct parameters are passed', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
       }
@@ -84,7 +77,7 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: false,
         name: 'Contoso',
-        filePath: 'theme.json',
+        theme: '123',
         isInverted: false
       }
     }, () => {
@@ -103,7 +96,6 @@ describe(commands.THEME_SET, () => {
 
   it('adds theme when correct parameters are passed (debug)', (done) => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
-
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         return Promise.resolve(JSON.stringify([{ "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7025.1207", "ErrorInfo": null, "TraceCorrelationId": "3d92299e-e019-4000-c866-de7d45aa9628" }, 12, true]));
       }
@@ -115,7 +107,7 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        filePath: 'theme.json',
+        theme: '123',
         isInverted: true
       }
     }, () => {
@@ -143,7 +135,7 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        filePath: 'theme.json',
+        theme: '{"isInverted":true,"name":"Contoso","palette":123}',
         inverted: false
       }
     } as any, (err?: any) => {
@@ -169,7 +161,7 @@ describe(commands.THEME_SET, () => {
       options: {
         debug: true,
         name: 'Contoso',
-        filePath: 'theme.json',
+        theme: '{"isInverted":true,"name":"Contoso","palette":123}',
         inverted: false
       }
     } as any, (err?: any) => {
@@ -183,35 +175,12 @@ describe(commands.THEME_SET, () => {
     });
   });
 
-  it('fails validation if file path doesn\'t exist', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { name: 'abc', filePath: 'abc', isInverted: false } });
+  it('fails validation if the specified theme is invalid', () => {
+    const actual = command.validate({ options: { name: 'abc', theme: '{ not valid }', isInverted: false } });
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if file path points to a directory', () => {
-    const stats: fs.Stats = new fs.Stats();
-    sinon.stub(stats, 'isDirectory').callsFake(() => true);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = command.validate({ options: { name: 'abc', filePath: 'abc', isInverted: false } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if file does not contain a valid theme', () => {
-    const stats: fs.Stats = new fs.Stats();
-    const theme: string = '{ not valid }';
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    readFileSyncStub.callsFake(() => theme);
-    sinon.stub(Utils, 'isValidTheme').callsFake(() => false);
-    const actual = command.validate({ options: { name: 'abc', filePath: 'contoso-blue.json', isInverted: false } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('passes validation when path points to a valid file', () => {
-    const stats: fs.Stats = new fs.Stats();
+  it('passes validation when specified theme is valid', () => {
     const theme = `{
       "themePrimary": "#d81e05",
       "themeLighterAlt": "#fdf5f4",
@@ -236,12 +205,8 @@ describe(commands.THEME_SET, () => {
       "black": "#1d1d1d",
       "white": "#f5f5f5"
     }`;
-    sinon.stub(stats, 'isDirectory').callsFake(() => false);
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    readFileSyncStub.callsFake(() => theme);
     sinon.stub(Utils, 'isValidTheme').callsFake(() => true);
-    const actual = command.validate({ options: { name: 'contoso-blue', filePath: 'contoso-blue.json', isInverted: false } });
+    const actual = command.validate({ options: { name: 'contoso-blue', theme, isInverted: false } });
 
     assert.strictEqual(actual, true);
   });
