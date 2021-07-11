@@ -7,6 +7,7 @@
 - removed duplicate ID in 'spo listitem' commands [#2024](https://github.com/pnp/cli-microsoft365/issues/2024)
 - removed the 'value' wrapper in the output [#2292](https://github.com/pnp/cli-microsoft365/issues/2292)
 - updated JMESPath docs [#2553](https://github.com/pnp/cli-microsoft365/issues/2553)
+- removed obsolete file path options [#2309](https://github.com/pnp/cli-microsoft365/issues/2309)
 
 ## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
 
