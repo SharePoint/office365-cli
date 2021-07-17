@@ -46,5 +46,6 @@ export default {
   SITECLASSIFICATION_SET: `${prefix} siteclassification set`,
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
-  USER_LIST: `${prefix} user list`
+  USER_LIST: `${prefix} user list`,
+  USER_HIBP: `${prefix} user hibp`
 };
