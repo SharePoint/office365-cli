@@ -1,11 +1,13 @@
-import { Logger } from '../../../../cli';
-import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
+import Command, { CommandError, CommandErrorWithOutput, CommandOption, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
+import GlobalOptions, { Output } from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import * as SpoContentTypeGetCommand from './contenttype-get';
+import { Options as SpoContentTypeGetCommandOptions } from './contenttype-get';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
@@ -75,8 +77,31 @@ class SpoContentTypeAddCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        
-        cb();
+
+        const options: SpoContentTypeGetCommandOptions = {
+          webUrl: args.options.webUrl,
+          listTitle: args.options.listTitle,
+          id: args.options.id,
+          output: args.options.output,
+          debug: this.debug,
+          verbose: this.verbose
+        };
+        Cli.executeCommandWithOutput(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } })
+          .then((res: CommandOutput): void => {
+            if (this.debug) {
+              logger.logToStderr(res.stderr);
+            }
+            let result = res.stdout;
+            if (options.output === Output[Output.json]) {
+              result = JSON.parse(result);
+            }
+
+            logger.log(result);
+            cb();
+          }, (err: CommandErrorWithOutput) => {
+            cb(err.error);
+          });
+        return;
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
