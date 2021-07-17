@@ -16,13 +16,17 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class AadO365GroupRestoreCommand extends GraphCommand {
+class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
   public get name(): string {
-    return commands.O365GROUP_RESTORE;
+    return commands.O365GROUP_RECYCLEBINITEM_RESTORE;
   }
 
   public get description(): string {
     return 'Restores a deleted Microsoft 365 Group';
+  }
+
+  public alias(): string[] | undefined {
+    return [commands.O365GROUP_RESTORE];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -37,9 +41,13 @@ class AadO365GroupRestoreCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/directory/deleteditems/${args.options.id}/restore/`,
+      url: `${this.resource}/v1.0/directory/deleteditems/${args.options.id}/restore`,
       headers: {
-        'accept': 'application/json;odata.metadata=none'
+<<<<<<< HEAD:src/m365/aad/commands/o365group/o365group-recyclebinitem-restore.ts
+        'Content-type': 'application/json;odata.metadata=none'
+=======
+        'Content-type': 'application/json'
+>>>>>>> 77bc1e70642158a67473eaa7a076169c77015fc1:src/m365/aad/commands/o365group/o365group-recyclebinitem-restore.ts
       }
     };
 
@@ -68,4 +76,4 @@ class AadO365GroupRestoreCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadO365GroupRestoreCommand();
+module.exports = new AadO365GroupRecycleBinItemRestoreCommand();

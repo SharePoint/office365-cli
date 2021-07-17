@@ -54,7 +54,8 @@ describe('Lazy loading commands', () => {
       'teams user add',
       'teams user list',
       'teams user remove',
-      'teams user set'
+      'teams user set',
+      'aad o365group restore'
     ];
     const allCommandNames: string[] = [];
 
