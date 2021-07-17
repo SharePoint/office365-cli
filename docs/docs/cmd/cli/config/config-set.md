@@ -11,7 +11,7 @@ m365 cli config set [options]
 ## Options
 
 `-k, --key <key>`
-: Config key to specify
+: Config key to specify. Allowed values: `errorOutput,output,printErrorsAsPlainText,showHelpOnFailure,autoOpenBrowserOnLogin`
 
 `-v, --value <value>`
 : Config value to set

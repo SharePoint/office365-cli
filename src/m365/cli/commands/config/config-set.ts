@@ -35,6 +35,7 @@ class CliConfigSetCommand extends AnonymousCommand {
     let value: any = undefined;
 
     switch (args.options.key) {
+      case settingsNames.autoOpenBrowserOnLogin:
       case settingsNames.showHelpOnFailure:
       case settingsNames.printErrorsAsPlainText:
         value = args.options.value === 'true';

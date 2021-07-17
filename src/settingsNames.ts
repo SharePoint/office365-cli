@@ -2,7 +2,8 @@ const settingsNames = {
   errorOutput: 'errorOutput',
   output: 'output',
   printErrorsAsPlainText: 'printErrorsAsPlainText',
-  showHelpOnFailure: 'showHelpOnFailure'
+  showHelpOnFailure: 'showHelpOnFailure',
+  autoOpenBrowserOnLogin: 'autoOpenBrowserOnLogin'
 };
 
 export { settingsNames };
