@@ -6,6 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
+import { Json } from '../../../../../node_modules/adaptive-expressions/lib/builtinFunctions';
 
 interface CommandArgs {
   options: Options;
@@ -27,7 +28,7 @@ class FlowRunGetCommand extends AzmgmtCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['name', 'startTime', 'endTime', 'status', 'triggerName'];
+    return ['name', 'startTime', 'endTime', 'status', 'triggerName', 'runUrl','triggerInformation'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -42,14 +43,21 @@ class FlowRunGetCommand extends AzmgmtCommand {
       },
       responseType: 'json'
     };
-
+    const fetch = require("node-fetch");
     request
       .get(requestOptions)
-      .then((res: any): void => {
+      .then(async (res: any): Promise<void> => {
         res.startTime = res.properties.startTime;
         res.endTime = res.properties.endTime || '';
+        res.properties = res.properties;
         res.status = res.properties.status;
-        res.triggerName = res.properties.trigger.name;
+        res.runUrl = `https://emea.flow.microsoft.com/manage/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs/${encodeURIComponent(args.options.name)}`;
+        await fetch( res.properties.trigger.outputsLink.uri)
+            .then((response: { text: () => Json; }) => response.text())
+            .then((data: any) => {
+                let jsondata = JSON.parse(data);
+                res.triggerInformation = jsondata.body;
+              });
         logger.log(res);
 
         cb();
