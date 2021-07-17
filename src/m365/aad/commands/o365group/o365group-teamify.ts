@@ -26,13 +26,23 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const data: any = {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
-      "group@odata.bind": `https://graph.microsoft.com/v1.0/groups('${encodeURIComponent(args.options.groupId)}')`
+    const data: any = {  
+      "memberSettings": {
+        "allowCreatePrivateChannels": true,
+        "allowCreateUpdateChannels": true
+      },
+      "messagingSettings": {
+        "allowUserEditMessages": true,
+        "allowUserDeleteMessages": true
+      },
+      "funSettings": {
+        "allowGiphy": true,
+        "giphyContentRating": "strict"
+      }
     };
 
     const requestOptions: any = {
-      url: `${this.resource}/beta/teams`,
+      url: `${this.resource}/v1.0/groups/${encodeURIComponent(args.options.groupId)}/team`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -41,7 +51,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
     };
 
     request
-      .post(requestOptions)
+      .put(requestOptions)
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
