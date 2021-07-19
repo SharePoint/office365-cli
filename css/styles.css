@@ -1,0 +1,38 @@
+.md-logo {
+  height: 32px;
+  width: 150px;
+}
+
+.md-logo img {
+  width: 100% !important;
+  height: auto !important;
+  margin-top: -0.25em;
+}
+
+.md-header{
+  height: 75px;
+}
+
+.md-container{
+  padding-top: 70px;
+}
+
+.md-sidebar[data-md-state="lock"]{
+  padding-top: 75px;
+}
+
+.md-footer {
+  margin-top: 5em;
+}
+
+@media only screen and (max-width: 76.1875em) {
+  .md-nav--primary .md-nav__title--site .md-nav__button {
+    width: 150px;
+  }
+}
+
+@media screen and (min-width: 964px) {
+  .md-typeset__scrollwrap {
+    overflow: visible;
+  }
+}
