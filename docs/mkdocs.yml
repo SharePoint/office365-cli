@@ -138,6 +138,7 @@ nav:
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
+        - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task list: 'cmd/planner/task/task-list.md'
