@@ -10,6 +10,7 @@ export default {
   CONFIG_RESET: `${prefix} config reset`,
   CONFIG_SET: `${prefix} config set`,
   CONSENT: `${prefix} consent`,
+  DOCTOR: `${prefix} doctor`,
   ISSUE: `${prefix} issue`,
   RECONSENT: `${prefix} reconsent`
 };

@@ -711,8 +711,8 @@ describe('Cli', () => {
       .execute(cliCommandsFolder, ['cli', 'mock', '-x', '1'])
       .then(_ => {
         try {
-          // 11 commands from the folder + 3 mocks
-          assert.strictEqual(cli.commands.length, 11 + 3);
+          // 12 commands from the folder + 3 mocks
+          assert.strictEqual(cli.commands.length, 12 + 3);
           done();
         }
         catch (e) {

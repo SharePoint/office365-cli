@@ -79,6 +79,7 @@ nav:
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
     - CLI (cli):
       - consent: 'cmd/cli/cli-consent.md'
+      - doctor: 'cmd/cli/cli-doctor.md'
       - issue: 'cmd/cli/cli-issue.md'
       - reconsent: 'cmd/cli/cli-reconsent.md'
       - completion:
